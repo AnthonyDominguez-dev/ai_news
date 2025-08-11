@@ -131,7 +131,7 @@ const appData = {
     total_articles: 78,
     active_sources: 25,
     monthly_growth: "+23%",
-    last_update: "2025-08-11T15:30:00Z"
+    last_update: "2025-08-11T16:08:00Z"
   }
 };
 
@@ -139,15 +139,116 @@ const appData = {
 let filteredArticles = [...appData.articles];
 let isAdminMode = false;
 let currentEditingArticle = null;
+let currentTheme = 'light';
+
+// Theme Management
+class ThemeManager {
+  constructor() {
+    this.currentTheme = 'light';
+    this.init();
+  }
+
+  init() {
+    // Get saved theme or detect system preference
+    const savedTheme = this.getSavedTheme();
+    const systemTheme = this.getSystemTheme();
+    
+    // Priority: saved theme > system theme > light
+    this.currentTheme = savedTheme || systemTheme || 'light';
+    this.applyTheme(this.currentTheme);
+    this.updateToggleButtons();
+
+    // Listen for system theme changes
+    if (window.matchMedia) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => {
+        if (!this.getSavedTheme()) {
+          const newSystemTheme = this.getSystemTheme();
+          this.applyTheme(newSystemTheme);
+          this.currentTheme = newSystemTheme;
+          this.updateToggleButtons();
+        }
+      };
+
+      if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', handleChange);
+      } else {
+        mediaQuery.addListener(handleChange);
+      }
+    }
+  }
+
+  getSavedTheme() {
+    try {
+      return localStorage.getItem('ai-news-theme');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  saveTheme(theme) {
+    try {
+      localStorage.setItem('ai-news-theme', theme);
+    } catch (e) {
+      console.log('Cannot save theme preference');
+    }
+  }
+
+  getSystemTheme() {
+    if (window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  }
+
+  applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    this.currentTheme = theme;
+  }
+
+  toggleTheme() {
+    const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+    this.applyTheme(newTheme);
+    this.saveTheme(newTheme);
+    this.updateToggleButtons();
+    
+    // Show notification
+    this.showThemeNotification(newTheme);
+  }
+
+  updateToggleButtons() {
+    const toggleButtons = document.querySelectorAll('.theme-toggle-icon');
+    const icon = this.currentTheme === 'light' ? '☀️' : '🌙';
+    
+    toggleButtons.forEach(button => {
+      button.textContent = icon;
+    });
+  }
+
+  showThemeNotification(theme) {
+    const message = theme === 'dark' ? 'Mode sombre activé' : 'Mode clair activé';
+    showNotification(message);
+  }
+}
+
+// Initialize theme manager
+let themeManager;
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing app...');
-    initializeApp();
+    
+    // Small delay to ensure DOM is fully ready
+    setTimeout(() => {
+        initializeApp();
+    }, 100);
 });
 
 function initializeApp() {
     console.log('Initializing app...');
+    
+    // Initialize theme manager
+    themeManager = new ThemeManager();
     
     // Hide loading state initially
     const loadingState = document.getElementById('loadingState');
@@ -166,73 +267,116 @@ function initializeApp() {
 function setupEventListeners() {
     console.log('Setting up event listeners...');
     
-    // Get DOM elements
-    const adminBtn = document.getElementById('adminBtn');
-    const adminModal = document.getElementById('adminModal');
-    const modalClose = document.getElementById('modalClose');
-    const loginBtn = document.getElementById('loginBtn');
-    const adminPassword = document.getElementById('adminPassword');
-    const adminDashboard = document.getElementById('adminDashboard');
-    const exitAdminBtn = document.getElementById('exitAdminBtn');
+    // Theme toggle buttons - Use event delegation for reliability
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#themeToggle') || e.target.closest('#adminThemeToggle')) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Theme toggle clicked');
+            if (themeManager) {
+                themeManager.toggleTheme();
+            }
+        }
+    });
+    
+    // Admin button
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#adminBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Admin button clicked');
+            showAdminModal();
+        }
+    });
+
+    // Modal close buttons
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#modalClose')) {
+            hideAdminModal();
+        }
+        if (e.target.closest('#articleModalClose')) {
+            hideArticleModal();
+        }
+    });
+
+    // Login button
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#loginBtn')) {
+            handleAdminLogin();
+        }
+    });
+
+    // Exit admin button
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#exitAdminBtn')) {
+            exitAdminMode();
+        }
+    });
+
+    // Mobile menu toggle
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#mobileMenuToggle')) {
+            toggleMobileMenu();
+        }
+    });
+
+    // Search input
     const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearch);
+        searchInput.addEventListener('keyup', handleSearch);
+    }
+
+    // Filter selects
     const categoryFilter = document.getElementById('categoryFilter');
     const sourceFilter = document.getElementById('sourceFilter');
     const dateFilter = document.getElementById('dateFilter');
-    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-    const nav = document.getElementById('nav');
 
-    // Admin modal
-    if (adminBtn) {
-        adminBtn.addEventListener('click', showAdminModal);
-        console.log('Admin button event listener added');
-    }
-    if (modalClose) modalClose.addEventListener('click', hideAdminModal);
-    if (loginBtn) loginBtn.addEventListener('click', handleAdminLogin);
-    if (exitAdminBtn) exitAdminBtn.addEventListener('click', exitAdminMode);
-
-    // Search and filters
-    if (searchInput) searchInput.addEventListener('input', handleSearch);
     if (categoryFilter) categoryFilter.addEventListener('change', handleFiltering);
     if (sourceFilter) sourceFilter.addEventListener('change', handleFiltering);
     if (dateFilter) dateFilter.addEventListener('change', handleFiltering);
 
-    // Mobile menu
-    if (mobileMenuToggle) mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-
     // Admin tabs
-    const adminTabs = document.querySelectorAll('.admin-tab');
-    adminTabs.forEach(tab => {
-        tab.addEventListener('click', () => switchAdminTab(tab.dataset.tab));
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.admin-tab')) {
+            const tab = e.target.closest('.admin-tab');
+            const tabName = tab.getAttribute('data-tab');
+            if (tabName) {
+                switchAdminTab(tabName);
+            }
+        }
     });
 
-    // Article management
-    const addArticleBtn = document.getElementById('addArticleBtn');
-    const articleModal = document.getElementById('articleModal');
-    const articleModalClose = document.getElementById('articleModalClose');
-    const cancelArticleBtn = document.getElementById('cancelArticleBtn');
+    // Article management buttons
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#addArticleBtn')) {
+            showAddArticleModal();
+        }
+        if (e.target.closest('#cancelArticleBtn')) {
+            hideArticleModal();
+        }
+        if (e.target.closest('#refreshBtn')) {
+            handleRefresh();
+        }
+    });
+
+    // Article form
     const articleForm = document.getElementById('articleForm');
-
-    if (addArticleBtn) addArticleBtn.addEventListener('click', showAddArticleModal);
-    if (articleModalClose) articleModalClose.addEventListener('click', hideArticleModal);
-    if (cancelArticleBtn) cancelArticleBtn.addEventListener('click', hideArticleModal);
-    if (articleForm) articleForm.addEventListener('submit', handleArticleSubmit);
-
-    // Refresh button
-    const refreshBtn = document.getElementById('refreshBtn');
-    if (refreshBtn) refreshBtn.addEventListener('click', handleRefresh);
+    if (articleForm) {
+        articleForm.addEventListener('submit', handleArticleSubmit);
+    }
 
     // Modal backdrop clicks
-    if (adminModal) {
-        adminModal.addEventListener('click', (e) => {
-            if (e.target === adminModal) hideAdminModal();
-        });
-    }
-
-    if (articleModal) {
-        articleModal.addEventListener('click', (e) => {
-            if (e.target === articleModal) hideArticleModal();
-        });
-    }
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            if (e.target.id === 'adminModal') {
+                hideAdminModal();
+            }
+            if (e.target.id === 'articleModal') {
+                hideArticleModal();
+            }
+        }
+    });
 
     // Close modals with Escape key
     document.addEventListener('keydown', (e) => {
@@ -242,7 +386,7 @@ function setupEventListeners() {
         }
     });
 
-    // Navigation
+    // Navigation links
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -253,6 +397,8 @@ function setupEventListeners() {
             
             // Apply category-based filtering for navigation
             const href = link.getAttribute('href');
+            const categoryFilter = document.getElementById('categoryFilter');
+            
             if (href === '#actualites') {
                 if (categoryFilter) categoryFilter.value = '';
                 applyFilters();
@@ -273,6 +419,30 @@ function setupEventListeners() {
             }
         });
     });
+
+    // Default theme setting in admin
+    const defaultThemeSelect = document.getElementById('defaultThemeSelect');
+    if (defaultThemeSelect) {
+        defaultThemeSelect.value = (themeManager && themeManager.getSavedTheme()) || 'auto';
+        defaultThemeSelect.addEventListener('change', (e) => {
+            const selectedTheme = e.target.value;
+            if (!themeManager) return;
+            
+            if (selectedTheme === 'auto') {
+                // Remove saved theme, use system preference
+                try {
+                    localStorage.removeItem('ai-news-theme');
+                } catch (e) {}
+                const systemTheme = themeManager.getSystemTheme();
+                themeManager.applyTheme(systemTheme);
+                themeManager.updateToggleButtons();
+            } else {
+                themeManager.applyTheme(selectedTheme);
+                themeManager.saveTheme(selectedTheme);
+                themeManager.updateToggleButtons();
+            }
+        });
+    }
     
     console.log('Event listeners setup complete');
 }
@@ -316,7 +486,7 @@ function createArticleCard(article) {
         <p class="article-summary">${article.summary}</p>
         <div class="article-footer">
             <div class="article-tags">
-                ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                ${article.tags.map(tag => `<span class="tag" data-tag="${tag}">${tag}</span>`).join('')}
             </div>
         </div>
     `;
@@ -328,7 +498,7 @@ function createArticleCard(article) {
             e.stopPropagation();
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
-                searchInput.value = tag.textContent;
+                searchInput.value = tag.getAttribute('data-tag') || tag.textContent;
                 handleSearch();
             }
         });
@@ -447,7 +617,10 @@ function showAdminModal() {
     }
     
     if (adminPassword) {
-        adminPassword.focus();
+        // Small delay to ensure modal is visible before focusing
+        setTimeout(() => {
+            adminPassword.focus();
+        }, 100);
     }
 }
 
@@ -666,7 +839,7 @@ function handleArticleSubmit(e) {
         content: articleContent ? articleContent.value : '',
         source: articleSource ? articleSource.value : '',
         category: articleCategory ? articleCategory.value : '',
-        tags: articleTags ? articleTags.value.split(',').map(tag => tag.trim()) : [],
+        tags: articleTags ? articleTags.value.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
         date: new Date().toISOString().split('T')[0],
         status: 'published'
     };
@@ -759,13 +932,16 @@ function showNotification(message) {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: var(--color-gray-dark);
-        color: white;
+        background: var(--accent-color);
+        color: var(--bg-primary);
         padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        border-radius: 0.75rem;
+        box-shadow: 0 8px 25px var(--shadow-medium);
         z-index: 1001;
+        font-weight: 500;
         animation: slideInRight 0.3s ease;
+        border: 2px solid var(--border-color);
+        backdrop-filter: blur(8px);
     `;
 
     document.body.appendChild(notification);
@@ -817,39 +993,6 @@ style.textContent = `
         to {
             transform: translateX(100%);
             opacity: 0;
-        }
-    }
-    
-    .mobile-open {
-        display: flex !important;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--color-white-pure);
-        flex-direction: column;
-        padding: var(--space-16);
-        box-shadow: var(--shadow-lg);
-        border-top: 1px solid var(--color-border);
-    }
-    
-    .no-articles {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: var(--space-32);
-        color: var(--color-text-secondary);
-        font-style: italic;
-    }
-    
-    @media (min-width: 769px) {
-        .mobile-open {
-            display: flex !important;
-            position: static;
-            flex-direction: row;
-            background: none;
-            padding: 0;
-            box-shadow: none;
-            border: none;
         }
     }
 `;

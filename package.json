@@ -1,0 +1,132 @@
+{
+  "name": "ai-news-hub",
+  "version": "1.0.0",
+  "description": "Plateforme moderne de veille sur l'intelligence artificielle avec interface d'administration et thème sombre/clair",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "start": "npx live-server --port=3000 --entry-file=index.html",
+    "dev": "npx live-server --port=3000 --entry-file=index.html --watch=.",
+    "build": "npm run minify:css && npm run minify:js",
+    "minify:css": "npx cleancss -o dist/style.min.css style.css",
+    "minify:js": "npx terser app.js -o dist/app.min.js",
+    "lint:css": "npx stylelint style.css",
+    "lint:js": "npx eslint app.js",
+    "format": "npx prettier --write *.html *.css *.js",
+    "validate": "npx html-validate index.html",
+    "lighthouse": "npx lighthouse http://localhost:3000 --view",
+    "deploy": "npm run build && gh-pages -d dist",
+    "test": "echo \"Tests à implémenter\" && exit 0"
+  },
+  "keywords": [
+    "intelligence-artificielle",
+    "veille-technologique",
+    "actualites-ia",
+    "dashboard",
+    "administration",
+    "dark-mode",
+    "responsive",
+    "news-aggregator",
+    "ai-trends",
+    "french"
+  ],
+  "author": {
+    "name": "AI News Hub",
+    "email": "contact@ainewshub.fr",
+    "url": "https://github.com/username/ai-news-hub"
+  },
+  "license": "MIT",
+  "homepage": "https://username.github.io/ai-news-hub",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/ai-news-hub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/ai-news-hub/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "> 1%",
+    "not dead"
+  ],
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "clean-css-cli": "^5.6.2",
+    "terser": "^5.19.2",
+    "eslint": "^8.45.0",
+    "prettier": "^3.0.0",
+    "stylelint": "^15.10.2",
+    "stylelint-config-standard": "^34.0.0",
+    "html-validate": "^8.2.0",
+    "lighthouse": "^10.4.0",
+    "gh-pages": "^5.0.0"
+  },
+  "dependencies": {},
+  "files": [
+    "index.html",
+    "style.css",
+    "app.js",
+    "README.md",
+    "dist/"
+  ],
+  "config": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "printWidth": 100
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 2021,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-console": "warn"
+    }
+  },
+  "stylelint": {
+    "extends": "stylelint-config-standard",
+    "rules": {
+      "color-no-invalid-hex": true,
+      "font-family-no-duplicate-names": true,
+      "function-calc-no-unspaced-operator": true,
+      "string-no-newline": true,
+      "unit-no-unknown": true,
+      "property-no-unknown": true,
+      "declaration-block-no-duplicate-properties": true,
+      "selector-pseudo-class-no-unknown": true,
+      "selector-pseudo-element-no-unknown": true,
+      "selector-type-no-unknown": true,
+      "media-feature-name-no-unknown": true,
+      "at-rule-no-unknown": true,
+      "no-duplicate-at-import-rules": true,
+      "no-duplicate-selectors": true,
+      "no-empty-source": true,
+      "no-extra-semicolons": true,
+      "no-invalid-double-slash-comments": true
+    }
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/username"
+  },
+  "volta": {
+    "node": "18.17.0",
+    "npm": "9.6.7"
+  }
+}
