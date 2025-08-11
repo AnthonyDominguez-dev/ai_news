@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI News Hub - Veille Intelligence Artificielle 2025</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>AI News Hub</h1>
+                </div>
+                <nav class="nav" id="nav">
+                    <a href="#accueil" class="nav-link active">Accueil</a>
+                    <a href="#actualites" class="nav-link">Actualités</a>
+                    <a href="#tendances" class="nav-link">Tendances</a>
+                    <a href="#apropos" class="nav-link">À propos</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn--outline btn--sm" id="adminBtn">Admin</button>
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Veille Intelligence Artificielle 2025</h1>
+                    <p class="hero-subtitle">Les dernières actualités et tendances IA</p>
+                    <div class="hero-stats">
+                        <span class="stat-item"><span id="totalArticles">78</span> articles</span>
+                        <span class="stat-separator">|</span>
+                        <span class="stat-item">Dernière mise à jour: <span id="lastUpdate">11 août 2025, 15:30</span></span>
+                        <span class="live-indicator">● Live</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search and Filters -->
+        <section class="search-section">
+            <div class="container">
+                <div class="search-box">
+                    <input type="text" class="form-control search-input" id="searchInput" placeholder="Rechercher des actualités IA...">
+                    <button class="search-btn">🔍</button>
+                </div>
+                <div class="filters">
+                    <select class="form-control filter-select" id="categoryFilter">
+                        <option value="">Toutes les catégories</option>
+                        <option value="Nouveaux Modèles">Nouveaux Modèles</option>
+                        <option value="Startups & Entreprises">Startups & Entreprises</option>
+                        <option value="Réglementation">Réglementation</option>
+                        <option value="Tendances 2025">Tendances 2025</option>
+                        <option value="Recherche & Innovation">Recherche & Innovation</option>
+                    </select>
+                    <select class="form-control filter-select" id="sourceFilter">
+                        <option value="">Toutes les sources</option>
+                        <option value="OpenAI">OpenAI</option>
+                        <option value="Google DeepMind">Google DeepMind</option>
+                        <option value="Mistral AI">Mistral AI</option>
+                        <option value="DeepSeek">DeepSeek</option>
+                    </select>
+                    <select class="form-control filter-select" id="dateFilter">
+                        <option value="">Toutes les dates</option>
+                        <option value="today">Aujourd'hui</option>
+                        <option value="week">Cette semaine</option>
+                        <option value="month">Ce mois</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Articles Section -->
+        <section class="articles-section">
+            <div class="container">
+                <h2 class="section-title">Articles Récents</h2>
+                <div class="articles-grid" id="articlesGrid">
+                    <!-- Articles will be populated by JavaScript -->
+                </div>
+                <div class="loading-state hidden" id="loadingState">
+                    <div class="loading-placeholder"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trends Section -->
+        <section class="trends-section">
+            <div class="container">
+                <h2 class="section-title">Tendances IA 2025</h2>
+                <div class="trends-grid">
+                    <div class="trend-card">
+                        <h3>Agents IA Autonomes</h3>
+                        <p>25% des entreprises lancent des projets pilotes</p>
+                        <div class="trend-stat">+180%</div>
+                    </div>
+                    <div class="trend-card">
+                        <h3>IA Multimodale</h3>
+                        <p>Fusion texte, image, son et vidéo</p>
+                        <div class="trend-stat">+245%</div>
+                    </div>
+                    <div class="trend-card">
+                        <h3>IA Frugale</h3>
+                        <p>Modèles performants à coût réduit</p>
+                        <div class="trend-stat">+95%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>AI News Hub</h4>
+                    <p>Plateforme de veille dédiée à l'intelligence artificielle</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Sources</h4>
+                    <p>OpenAI, Google DeepMind, Mistral AI, Commission Européenne</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>© 2025 AI News Hub - Tous droits réservés</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Login Modal -->
+    <div class="modal hidden" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Connexion Administration</h3>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="adminPassword" placeholder="Entrez le mot de passe admin">
+                </div>
+                <button class="btn btn--primary btn--full-width" id="loginBtn">Se connecter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-dashboard hidden" id="adminDashboard">
+        <div class="admin-header">
+            <h2>Dashboard Administration</h2>
+            <button class="btn btn--outline btn--sm" id="exitAdminBtn">Retour Public</button>
+        </div>
+        
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="overview">Vue d'ensemble</button>
+            <button class="admin-tab" data-tab="articles">Articles</button>
+            <button class="admin-tab" data-tab="sources">Sources</button>
+            <button class="admin-tab" data-tab="settings">Paramètres</button>
+        </div>
+
+        <div class="admin-content">
+            <!-- Overview Tab -->
+            <div class="admin-tab-content active" id="overview">
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <h3>78</h3>
+                        <p>Articles publiés</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>25</h3>
+                        <p>Sources actives</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>+23%</h3>
+                        <p>Croissance mensuelle</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>15:30</h3>
+                        <p>Dernière mise à jour</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles Tab -->
+            <div class="admin-tab-content" id="articles">
+                <div class="admin-toolbar">
+                    <button class="btn btn--primary" id="addArticleBtn">Ajouter un article</button>
+                    <button class="btn btn--secondary" id="refreshBtn">Actualiser</button>
+                </div>
+                <div class="admin-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Source</th>
+                                <th>Date</th>
+                                <th>Catégorie</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="articlesTable">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sources Tab -->
+            <div class="admin-tab-content" id="sources">
+                <div class="admin-toolbar">
+                    <button class="btn btn--primary" id="addSourceBtn">Ajouter une source</button>
+                </div>
+                <div class="sources-grid" id="sourcesGrid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="admin-tab-content" id="settings">
+                <div class="settings-section">
+                    <h3>Paramètres généraux</h3>
+                    <div class="form-group">
+                        <label class="form-label">Fréquence de mise à jour</label>
+                        <select class="form-control">
+                            <option>Toutes les heures</option>
+                            <option>Toutes les 6 heures</option>
+                            <option>Quotidienne</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Articles par page</label>
+                        <input type="number" class="form-control" value="12">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Article Form Modal -->
+    <div class="modal hidden" id="articleModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="articleModalTitle">Ajouter un article</h3>
+                <button class="modal-close" id="articleModalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="articleForm">
+                    <div class="form-group">
+                        <label class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="articleTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Résumé</label>
+                        <textarea class="form-control" id="articleSummary" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contenu</label>
+                        <textarea class="form-control" id="articleContent" rows="6" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Source</label>
+                        <input type="text" class="form-control" id="articleSource" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Catégorie</label>
+                        <select class="form-control" id="articleCategory" required>
+                            <option value="">Sélectionner une catégorie</option>
+                            <option value="Nouveaux Modèles">Nouveaux Modèles</option>
+                            <option value="Startups & Entreprises">Startups & Entreprises</option>
+                            <option value="Réglementation">Réglementation</option>
+                            <option value="Tendances 2025">Tendances 2025</option>
+                            <option value="Recherche & Innovation">Recherche & Innovation</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tags (séparés par des virgules)</label>
+                        <input type="text" class="form-control" id="articleTags">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary">Enregistrer</button>
+                        <button type="button" class="btn btn--outline" id="cancelArticleBtn">Annuler</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
